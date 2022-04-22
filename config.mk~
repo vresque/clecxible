@@ -1,2 +1,0 @@
-CC=clang
-CFLAGS=-Werror -Wall -O2 --asan --asan-module
