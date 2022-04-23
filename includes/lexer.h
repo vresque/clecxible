@@ -31,7 +31,7 @@ enum TokenType {
 
   TOKEN_AND = '&',
   TOKEN_OR = '|',
-  TOKEN_NEG = '~',
+  TOKEN_BNEG = '~',
   
   TOKEN_TYPE_START = 256,
   TOKEN_INTEGER,
@@ -131,6 +131,7 @@ struct Lexer {
   usize line;
   const char* fname;
   const char* contents;
+  usize content_len;
 };
 
 
@@ -140,3 +141,4 @@ void token_stream_drop(struct TokenStream* self);
 void lexer_new(struct Lexer* self, char* fname);
 void lexer_lex(struct Lexer* self);
 void lexer_drop(struct Lexer* self);
+extern  enum TokenType token_types[];

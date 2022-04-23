@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* read_to_string(char* fname) {
+// SAFETY: A NULL may be passed to length if you do not care about the total size of the file
+char* read_to_string(char* fname, u64* length) {
   FILE* f = fopen(fname, "rb");
   if (!f) {
     die("failed to open file: %s", fname);
@@ -14,5 +15,10 @@ char* read_to_string(char* fname) {
   fread(contents, size, 1, f);
   fclose(f);
   contents[size] = 0;
+
+  if (length) {
+    *length = size;
+  }
+  
   return contents;
 }
