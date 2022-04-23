@@ -6,7 +6,7 @@ DEFINES=-DVERSION="$(VERSION)" \
 SOURCE_DIR=sources
 BUILD_DIR=build
 OBJECT_DIR=$(BUILD_DIR)/objects
-CFLAGS+=-I./includes
+CFLAGS+=-I./includes $(DEFINES) -Wno-incompatible-pointer-types-discards-qualifiers
 
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 SRC=$(call rwildcard,$(SOURCE_DIR),*.c)

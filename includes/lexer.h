@@ -1,6 +1,10 @@
 #pragma once
 #include <core.h>
 #include <location.h>
+#include <vec.h>
+
+#define KEYWORD_MAX 16
+#define TOKEN_INITIAL_CAP 100
 
 enum TokenType {
   TOKEN_GT = '>',
@@ -89,6 +93,7 @@ enum TokenType {
   TOKEN_KW_RETURN,
   TOKEN_KW_SHORT,
 
+  TOKEN_INVAL,
   FINAL_TOKEN,
 };
 
@@ -134,3 +139,4 @@ void token_stream_drop(struct TokenStream* self);
 
 void lexer_new(struct Lexer* self, char* fname);
 void lexer_lex(struct Lexer* self);
+void lexer_drop(struct Lexer* self);
