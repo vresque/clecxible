@@ -12,12 +12,14 @@ void usage() {
   printf("%s\n", G_USAGE);
 }
 
-struct arguments parse_args(i32 argc, ichar** argv) {
+struct Arguments parse_args(i32 argc, ichar** argv) {
   if (argc < 2) {
     usage();
     die("too little arguments were given");
   }
-  struct arguments returns = {0};
+  struct Arguments returns = {0};
+  // TODO: Very unsafe
+  returns.filepath = argv[1];
 
   return (returns);
 }

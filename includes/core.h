@@ -7,6 +7,7 @@
 
 #define UNUSED(val) (void)val;
 #define STRINGIFY(val) #val
+#define RANGE(a, b) a ... b
 #define verify(return_value, msg, ...) if ( (return_value) ) {\
     fprintf(\
 	    stderr, "program crashed during runtime.\nerrorcode: %d\n error:\n%s\nerrno: %d\nstringified errno: %s\n" \

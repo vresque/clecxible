@@ -1,14 +1,14 @@
 #pragma once
 
-enum target {
+enum Target {
   X86_64,
 };
 
-enum output_format {
+enum OutputFormat {
   ELF,
 };
 
-enum platform {
+enum Platform {
   WINDOWS,
   UNIX,
 };

@@ -116,11 +116,21 @@ struct Token {
 
 
 struct TokenStream {
-  struct vec* tokens;
+  struct Vec* tokens;
   usize token_index;
 };
 
 struct Lexer {
   struct TokenStream* stream;
   usize index;
+  usize line;
+  const char* fname;
+  const char* contents;
 };
+
+
+struct TokenStream* token_stream_new();
+void token_stream_drop(struct TokenStream* self);
+
+void lexer_new(struct Lexer* self, char* fname);
+void lexer_lex(struct Lexer* self);

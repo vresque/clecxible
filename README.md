@@ -2,7 +2,7 @@
 
 C-Language, with extensions.
 
-A working C(11) compiler with some extensions, as well as the ability to add (simple) extensions via `.c-ext` files
+A C(11) compiler with some extensions, as well as the ability to add (simple) extensions via `.c-ext` files
 
 Example of a `.c-ext` file, which adds namespaces
 ```c
@@ -53,3 +53,6 @@ There are two ways to activate an extension.
 ```bash
 clecxc --extension "g:namespaces"
 ```
+
+## Do extensions not destroy the purpose of C?
+Extensions should not be thought of as adding features, but much rather as **very** powerful macros.
