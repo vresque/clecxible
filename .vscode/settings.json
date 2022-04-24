@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "core.h": "c",
+        "errno.h": "c",
+        "string.h": "c",
+        "fs.h": "c",
+        "lexer.h": "c"
+    }
+}

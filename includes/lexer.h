@@ -121,7 +121,7 @@ struct Token {
 
 
 struct TokenStream {
-  struct Vec* tokens;
+  Vec(struct Token) tokens;
   usize token_index;
 };
 

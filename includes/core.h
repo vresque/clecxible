@@ -86,3 +86,5 @@ typedef char ichar;
 
 #include <limits.h>
 typedef uchar path[PATH_MAX];
+
+#define do_once(body) do { body } while (false)

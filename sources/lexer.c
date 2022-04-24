@@ -1,6 +1,11 @@
 #include <lexer.h>
 #include <fs.h>
+#include <ctype.h>
 #include <location.h>
+
+#define tpush_simple(tok, str) tpush((struct Token){ .ty = tok, .loc = this_loc(), .start = str, .token_len = 1})
+#define tpush(tok) vec_push_one(self->stream->tokens, tok)
+#define tpush_str(tok, str, len) tpush((struct Token){ .ty = tok, .loc = this_loc(), .start = str, .token_len = len})
 
 static const char utility_keywords[][KEYWORD_MAX] = {
   "_Alignas",
@@ -102,20 +107,33 @@ char next(struct Lexer* self) {
   return 0;
 }
 
+char peek(struct Lexer* self) {
+  if (self->index + 1 < self->content_len) {
+    return self->contents[self->index + 1];
+  }
+  return 0;
+}
+
+char this(struct Lexer* self) {
+  if (self->index < self->content_len) {
+    return self->contents[self->index];
+  }
+  return 0;
+}
+
 struct Location this_loc(struct Lexer* self) {
   return (struct Location){
     .file_name = self->fname,
     .line_as_string = &self->contents[self->index],
     .line_length = 10, // TODO: Change
     .line_number = self->line,
-    .column_number = (self->index / self->line),
+    .column_number = (self->index / self->line), // TODO: Change
   };
 }
 
 struct TokenStream* token_stream_new() {
   struct TokenStream* self = malloc(sizeof(struct TokenStream));
-  self->tokens = malloc(sizeof(struct Vec));
-  vec_new(self->tokens, TOKEN_INITIAL_CAP);
+  self->tokens = vec_new(struct Token, TOKEN_INITIAL_CAP);
   self->token_index = 0;
   return self;
 }
@@ -153,12 +171,43 @@ void lexer_new(struct Lexer* self, char* fname) {
   read_to_string(fname, &self->content_len);
 }
 
+void skip_whitespace(struct Lexer* self) {
+  if (isspace(this(self))) {
+    advance(self);
+  }
+  while (true) {
+  char chr = peek(self);
+  if (chr && isspace(chr)) {
+    advance(self);
+  } else { break; }
+  }
+}
+
+struct Token lex_ident(struct Lexer* self) {
+  Vec(char) final_string = vec_new(char, 10);
+  vec_push_one(final_string, this(self));
+  char chr;
+  while ( (chr = next(self)) && isalpha(chr)) {
+      vec_push_one(final_string, chr);
+  }
+  vec_push_one(final_string, 0);
+  printf("Found lexed ident: %s", final_string);
+  return (struct Token) {
+    .loc = this_loc(self),
+    .start = final_string,
+    .token_len = vec_len(final_string),
+    .ty = TOKEN_IDENTIFIER
+  };
+}
+
 void lexer_lex(struct Lexer* self) {
+  skip_whitespace(self);
   char chr;
   while ( (chr = next(self)) ) {
     enum TokenType type = token_types[(usize)chr];
     switch (type) {
     case TOKEN_IDENTIFIER:
+      tpush(lex_ident(self));
     case TOKEN_INTEGER:
     case TOKEN_SINGLE_QUOTE:
     case TOKEN_DOUBLE_QUOTE:

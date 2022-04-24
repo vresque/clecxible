@@ -6,37 +6,7 @@ C-Language, with extensions.
 ## Plan
 A C(11) compiler with some extensions, as well as the ability to add (simple) extensions via `.c-ext` files
 
-I am still undecided, which way of adding extensions would be better
-
-### Option A
-Example of a `.c-ext` file, which adds namespaces
-```c
-(set-name "Namespaces")
-(set-description "Introduces namespaces to C")
-(set-version "0.1")
-(runs-after parsing)
-(assert-in-domain module) ;; Asserts that it is either in another namespace or in the global scope, but not in functions, etc
-(set-pattern
-	namespace ?name ?block 
-)
-(set-param-type ?name ident)
-;; Another possible option here
-;; (set-param-optional ?block)
-(set-param-type ?block block)
-
-(activate (?name ?block) (
-	(for_item_in_block it block (
-		(push (concat_idents ?name (get-name it))) ;; No local variables, just push, pop, dup and clear
-		(set-exported-name it (pop))
-		(set-domain it module)
-	))
-))
-
-```
-
-All that this does is define an extension, called "Namespaces", which matches `namespace IDENT BLOCK` and changes the **exported** name of all items within `BLOCK` to `namespace_name_item_name`.
-
-### Option B
+### A simple extension
 ```c
 #include <clecxible.h>
 
@@ -73,15 +43,12 @@ NEW_EXTENSION(
 );
 ```
 
-This would then be compiled into a shared object and dynamically linked to at runtime.
+This will then be compiled into a shared object (`*.c-ext-lib`) and dynamically linked at runtime.
 
-Pros:
-- C-Syntax
-- One parser can do it all
-Cons:
-- Would force developers to either include this binary in their repository, or to force devs to get it on their local system
+All that this does is define an extension, called "Namespaces", which matches `namespace IDENT BLOCK` and changes the **exported** name of all items within `BLOCK` to `namespace_name_item_name`.
 
-### Example
+
+#### Example
 ```c
 namespace abc {
 	void hello();
