@@ -19,9 +19,9 @@ void* _vec_prep_push(void* self, usize count);
 struct VecInfo* vec_grow(void* self, usize to);
 void* _vec_prep_push(void* self, usize count);
 void _vec_clear(void** self, usize cap);
+// Resizes self so that cap == len
+void vec_downsize(void* self);
 usize vec_len(void* self);
-
-void vec_display(void* self);
 
 #define vec_new(T, cap) _vec_new(sizeof(T), cap)
 
@@ -33,3 +33,11 @@ void vec_display(void* self);
 })
 
 #define GET_VEC_INFO(this) ( ( (struct VecInfo*) this) - 1 )
+#define FOR_EACH_VEC(vec, name, body) do_once({ \
+  typeof(*vec) name = vec[0]; \
+  struct VecInfo* ____loop_runner__ = GET_VEC_INFO(vec); \
+  for (u64 idx = 0; idx < ____loop_runner__->len; idx++) { \
+    name = vec[idx]; \
+    do_once(body); \
+  } \
+});

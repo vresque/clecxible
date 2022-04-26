@@ -64,6 +64,97 @@ static const char keywords[][KEYWORD_MAX] = {
 
 #define KEYWORDS_LEN (sizeof(keywords) / KEYWORD_MAX)
 
+static const char token_str[][TOKEN_STR_MAX] = {
+  [TOKEN_GT] = ">",
+  [TOKEN_LT] = "<",
+  [TOKEN_PLUS] = "+",
+  [TOKEN_MINUS] = "-",
+  [TOKEN_MUL] = "*",
+  [TOKEN_DIV] = "/",
+  [TOKEN_MOD] = "%",
+  [TOKEN_ASSIGN] = "=",
+  [TOKEN_HASHTAG] = "#",
+  [TOKEN_COLON] = ":",
+  [TOKEN_SEMI] = ";",
+  [TOKEN_LBRACKET] = "[",
+  [TOKEN_RBRACKET] = "]",
+  [TOKEN_LPAREN] = "(",
+  [TOKEN_RPAREN] = ")",
+  [TOKEN_LBRACE] = "{",
+  [TOKEN_RBRACE] = "}",
+  [TOKEN_SINGLE_QUOTE] = "\'",
+  [TOKEN_DOUBLE_QUOTE] = "\"",
+  [TOKEN_COMMA] = ",",
+  [TOKEN_DOT] = ".",
+
+  [TOKEN_AND] = "&",
+  [TOKEN_OR] = "|",
+  [TOKEN_BNEG] = "~",
+  
+  [TOKEN_TYPE_START] = "<type_start>",
+  [TOKEN_INTEGER] = "<int>",
+  [TOKEN_FLOAT] = "<float>",
+  [TOKEN_RANGE] = "<range>",
+  [TOKEN_CHAR] = "<char>",
+  [TOKEN_STRING] = "<string>",
+
+  [TOKEN_IDENTIFIER] = "<Ident>",
+  
+  [TOKEN_UTIL_START] = "<UtilStart>",
+  [TOKEN_UT_ALIGNAS] = "_Alignas",
+  [TOKEN_UT_ALIGNOF] = "_Alignof",
+  [TOKEN_UT_ATOMIC] = "_Atomic",
+  [TOKEN_UT_BOOL] = "_Bool",
+  [TOKEN_UT_COMPLEX] = "_Complex",
+  [TOKEN_UT_GENERIC] = "_Generic",
+  [TOKEN_UT_IMAGINARY] = "_Imaginary",
+  [TOKEN_UT_PRAGMA] = "_Pragma",
+  [TOKEN_UT_NORETURN] = "_Noreturn",
+  [TOKEN_UT_STATIC_ASSERT] = "_Static_assert",
+  [TOKEN_UT_THREAD_LOCAL] = "_Thread_local",
+  [TOKEN_UT_TYPEOF] = "_Typeof",
+  [TOKEN_UT_VECTOR] = "_Vector",
+  [TOKEN_UT_CDECL] = "__cdecl",
+  [TOKEN_UT_STDCALL] = "__stdcall",
+  [TOKEN_UT_DECLSPEC] = "__declspec",
+
+  [TOKEN_KW_START] = "<KwStart>",
+  [TOKEN_KW_WHILE] = "while",
+  [TOKEN_KW_BREAK] = "break",
+  [TOKEN_KW_CASE] = "case",
+  [TOKEN_KW_CONST] = "const",
+  [TOKEN_KW_CONTINUE] = "continue",
+  [TOKEN_KW_VOLATILE] = "volatile",
+  [TOKEN_KW_VOID] = "void",
+  [TOKEN_KW_UNSIGNED] = "unsigned",
+  [TOKEN_KW_UNION] = "union",
+  [TOKEN_KW_DEFAULT] = "default",
+  [TOKEN_KW_DO] = "do",
+  [TOKEN_KW_DOUBLE] = "double",
+  [TOKEN_KW_ELSE] = "else",
+  [TOKEN_KW_IF] = "if",
+  [TOKEN_KW_ENUM] = "enum",
+  [TOKEN_KW_EXTERN] = "extern",
+  [TOKEN_KW_TYPEDEF] = "typedef",
+  [TOKEN_KW_SWITCH] = "switch",
+  [TOKEN_KW_STRUCT] = "struct",
+  [TOKEN_KW_STATIC] = "static",
+  [TOKEN_KW_SIZEOF] = "sizeof",
+  [TOKEN_KW_SIGNED] = "signed",
+  [TOKEN_KW_FLOAT] = "float",
+  [TOKEN_KW_FOR] = "for",
+  [TOKEN_KW_GOTO] = "goto",
+  [TOKEN_KW_INLINE] = "inline",
+  [TOKEN_KW_INT] = "int",
+  [TOKEN_KW_LONG] = "long",
+  [TOKEN_KW_REGISTER] = "register",
+  [TOKEN_KW_RETURN] = "return",
+  [TOKEN_KW_SHORT] = "short",
+
+  [TOKEN_INVAL] = "<Invalid>",
+  [FINAL_TOKEN] = "<Final>",
+};
+
 enum TokenType token_types[] = {
   ['>'] = TOKEN_GT,
     ['<'] = TOKEN_LT,
@@ -100,6 +191,7 @@ enum TokenType token_types[] = {
   }
 
 char next(struct Lexer* self) {
+  printf("nex\n");
   advance(self);
   if (self->index < self->content_len) {
     return self->contents[self->index];
@@ -161,14 +253,11 @@ enum TokenType get_corresponding_keyword_type(char* keyword, bool* match_found) 
 }
 
 void lexer_new(struct Lexer* self, char* fname) {
-  if (self == NULL) {
-    self = malloc(sizeof(struct Lexer*));
-  }
   self->stream = token_stream_new();
   self->index = 0;
   self->line = 0;
   self->fname = fname;
-  read_to_string(fname, &self->content_len);
+  self->contents = read_to_string(fname, &self->content_len);
 }
 
 void skip_whitespace(struct Lexer* self) {
@@ -184,14 +273,18 @@ void skip_whitespace(struct Lexer* self) {
 }
 
 struct Token lex_ident(struct Lexer* self) {
+  printf("hel\n");
   Vec(char) final_string = vec_new(char, 10);
   vec_push_one(final_string, this(self));
   char chr;
   while ( (chr = next(self)) && isalpha(chr)) {
       vec_push_one(final_string, chr);
   }
+    printf("hel\n");
+
   vec_push_one(final_string, 0);
-  printf("Found lexed ident: %s", final_string);
+  printf("Found lexed ident: %s\n", final_string);
+
   return (struct Token) {
     .loc = this_loc(self),
     .start = final_string,
@@ -201,24 +294,28 @@ struct Token lex_ident(struct Lexer* self) {
 }
 
 void lexer_lex(struct Lexer* self) {
-  skip_whitespace(self);
   char chr;
   while ( (chr = next(self)) ) {
+    skip_whitespace(self);
     enum TokenType type = token_types[(usize)chr];
+  printf("He %d\n", type);
     switch (type) {
-    case TOKEN_IDENTIFIER:
+    case TOKEN_IDENTIFIER: {
       tpush(lex_ident(self));
+      break;
+    }
     case TOKEN_INTEGER:
     case TOKEN_SINGLE_QUOTE:
     case TOKEN_DOUBLE_QUOTE:
     default: {
+      printf("def %s\n", token_str[type]);
       struct Token tok =  {
-	.ty = type,
-	.loc = this_loc(self),
-	.start = self->contents + self->index,
-	.token_len = 1,
-	  };
-      UNUSED(tok)
+        .ty = type,
+        .loc = this_loc(self),
+        .start = self->contents + self->index,
+        .token_len = 1,
+	    };
+      tpush(tok);
     }
   }
 }
@@ -229,4 +326,11 @@ void lexer_drop(struct Lexer* self) {
   free(self->fname);
   free(self->contents);
   free(self);
+}
+
+void lexer_dump(struct Lexer* self) {
+  printf("Lexer: File %s\n", self->fname);
+  FOR_EACH_VEC(self->stream->tokens, it, {
+    printf("[%s]: Len %lu, Payload:  '%s'\n", token_str[it.ty], it.token_len, it.start);
+  });
 }

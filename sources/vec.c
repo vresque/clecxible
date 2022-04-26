@@ -4,7 +4,6 @@
 
 #define GET_INFO(this) GET_VEC_INFO(this)
 void* _vec_new(usize elem_size, usize cap) {
-  puts("lo");
   struct VecInfo* info = calloc(1, sizeof(struct VecInfo) + (elem_size * cap));
   if (!info) { die("failed to allocate new vector"); }
   info->elem_size = elem_size;
@@ -34,6 +33,11 @@ void* _vec_prep_push(void* self, usize count) {
     return &new->data[0];
   }
   return self;
+}
+
+void vec_downsize(void* self) {
+  struct VecInfo* info = GET_INFO(self);
+  vec_grow(self, info->len * info->elem_size);
 }
 
 void _vec_clear(void** self, usize cap) {

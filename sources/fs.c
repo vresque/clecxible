@@ -16,7 +16,7 @@ char* read_to_string(char* fname, u64* length) {
   fclose(f);
   contents[size] = 0;
 
-  if (length) {
+  if (length != NULL) {
     *length = size;
   }
   

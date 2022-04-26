@@ -5,6 +5,7 @@
 
 #define KEYWORD_MAX 16
 #define TOKEN_INITIAL_CAP 100
+#define TOKEN_STR_MAX 16
 
 enum TokenType {
   TOKEN_GT = '>',
@@ -141,4 +142,5 @@ void token_stream_drop(struct TokenStream* self);
 void lexer_new(struct Lexer* self, char* fname);
 void lexer_lex(struct Lexer* self);
 void lexer_drop(struct Lexer* self);
+void lexer_dump(struct Lexer* self);
 extern  enum TokenType token_types[];
