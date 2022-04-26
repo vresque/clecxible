@@ -184,14 +184,16 @@ enum TokenType token_types[] = {
     [ 'a' ... 'z'] = TOKEN_IDENTIFIER,
     ['_'] = TOKEN_IDENTIFIER,
     ['$'] = TOKEN_IDENTIFIER,
-    ['0' ... '9'] = TOKEN_INTEGER
+    ['0' ... '9'] = TOKEN_INTEGER,
+    [ '\n' ] = TOKEN_NEWLINE,
+    [ '\r' ] = TOKEN_DISCARD,
 };
   void advance(struct Lexer* self) {
     self->index++;
+    self->col++;
   }
 
 char next(struct Lexer* self) {
-  printf("nex\n");
   advance(self);
   if (self->index < self->content_len) {
     return self->contents[self->index];
@@ -219,7 +221,7 @@ struct Location this_loc(struct Lexer* self) {
     .line_as_string = &self->contents[self->index],
     .line_length = 10, // TODO: Change
     .line_number = self->line,
-    .column_number = (self->index / self->line), // TODO: Change
+    .column_number = self->col, // TODO: Change
   };
 }
 
@@ -285,23 +287,30 @@ struct Token lex_ident(struct Lexer* self) {
   vec_push_one(final_string, 0);
   printf("Found lexed ident: %s\n", final_string);
 
-  return (struct Token) {
+  struct Token t = (struct Token) {
     .loc = this_loc(self),
     .start = final_string,
     .token_len = vec_len(final_string),
     .ty = TOKEN_IDENTIFIER
   };
+  printf("here\n");
+  return t;
 }
 
 void lexer_lex(struct Lexer* self) {
+  skip_whitespace(self);
   char chr;
   while ( (chr = next(self)) ) {
-    skip_whitespace(self);
     enum TokenType type = token_types[(usize)chr];
   printf("He %d\n", type);
     switch (type) {
     case TOKEN_IDENTIFIER: {
       tpush(lex_ident(self));
+      break;
+    }
+    case TOKEN_NEWLINE: {
+      self->line++;
+      self->col = 0;
       break;
     }
     case TOKEN_INTEGER:
@@ -312,12 +321,13 @@ void lexer_lex(struct Lexer* self) {
       struct Token tok =  {
         .ty = type,
         .loc = this_loc(self),
-        .start = self->contents + self->index,
+        .start =&self->contents[self->index],
         .token_len = 1,
 	    };
       tpush(tok);
     }
   }
+    skip_whitespace(self);
 }
 }
 
@@ -331,6 +341,6 @@ void lexer_drop(struct Lexer* self) {
 void lexer_dump(struct Lexer* self) {
   printf("Lexer: File %s\n", self->fname);
   FOR_EACH_VEC(self->stream->tokens, it, {
-    printf("[%s]: Len %lu, Payload:  '%s'\n", token_str[it.ty], it.token_len, it.start);
+      printf("[%s]: \n\t Len %lu;\n\t Line %d;\n\t Column %d;\n\t Payload: '%s';\n", token_str[it.ty], it.token_len, it.loc.line_number, it.loc.column_number, it.start);
   });
 }

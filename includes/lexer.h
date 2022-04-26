@@ -94,7 +94,9 @@ enum TokenType {
   TOKEN_KW_RETURN,
   TOKEN_KW_SHORT,
 
+  TOKEN_NEWLINE,
   TOKEN_INVAL,
+  TOKEN_DISCARD,
   FINAL_TOKEN,
 };
 
@@ -130,6 +132,7 @@ struct Lexer {
   struct TokenStream* stream;
   usize index;
   usize line;
+  usize col;
   const char* fname;
   const char* contents;
   usize content_len;
