@@ -12,12 +12,12 @@ enum OptLevel {
 };
 
 struct Arguments {
-  char* filepath; // <cmd> <fname>
-  enum Target target; // <cmd> --target <x86_64>
-  enum OutputFormat format; // <cmd> --format <elf|mach-o| 
-  enum Platform plat; // <cmd> --platform <windows|unix>
+  char *filepath;             // <cmd> <fname>
+  enum Target target;         // <cmd> --target <x86_64>
+  enum OutputFormat format;   // <cmd> --format <elf|mach-o|
+  enum Platform plat;         // <cmd> --platform <windows|unix>
   enum OptLevel optimization; // <cmd> --optimize|-O <0,1,2,3,size>
 };
 
-struct Arguments parse_args(i32 argc, ichar** argv);
+struct Arguments parse_args(i32 argc, ichar **argv);
 void usage();

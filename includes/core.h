@@ -1,27 +1,36 @@
 #pragma once
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
 
 #define UNUSED(val) (void)val;
 #define STRINGIFY(val) #val
-#define RANGE(a, b) a ... b
-#define verify(return_value, msg, ...) if ( (return_value) ) {\
-    fprintf(\
-	    stderr, "program crashed during runtime.\nerrorcode: %d\n error:\n%s\nerrno: %d\nstringified errno: %s\n" \
-	    "location of crash: file " __FILE__ "; line %d; function " __func__,							       \
-      return_value, \
-	    strerror(return_value), errno, strerror(errno), __LINE__); die("" msg, ##__VA_ARGS__); \
+#define RANGE(a, b) a... b
+#define verify(return_value, msg, ...)                                         \
+  if ((return_value)) {                                                        \
+    fprintf(stderr,                                                            \
+            "program crashed during runtime.\nerrorcode: %d\n "                \
+            "error:\n%s\nerrno: %d\nstringified errno: %s\n"                   \
+            "location of crash: file " __FILE__                                \
+            "; line %d; function " __func__,                                   \
+            return_value, strerror(return_value), errno, strerror(errno),      \
+            __LINE__);                                                         \
+    die("" msg, ##__VA_ARGS__);                                                \
   }
 
-#define assert(cond, msg, ...) if (!(cond)) { \
-  fprintf(stderr, \
-	  "assertion failed: " STRINGIFY(cond) "\nlocation of failure: file " __FILE__ "; line %d; function %s\n", __LINE__, __func__); die(msg, ##__VA_ARGS__); }
+#define assert(cond, msg, ...)                                                 \
+  if (!(cond)) {                                                               \
+    fprintf(stderr,                                                            \
+            "assertion failed: " STRINGIFY(                                    \
+                cond) "\nlocation of failure: file " __FILE__                  \
+                      "; line %d; function %s\n",                              \
+            __LINE__, __func__);                                               \
+    die(msg, ##__VA_ARGS__);                                                   \
+  }
 
-
-int die(const char* s, ...);
+int die(const char *s, ...);
 
 typedef signed char i8;
 typedef short int i16;
@@ -87,4 +96,7 @@ typedef char ichar;
 #include <limits.h>
 typedef uchar path[PATH_MAX];
 
-#define do_once(body) do { body } while (false)
+#define do_once(body)                                                          \
+  do {                                                                         \
+    body                                                                       \
+  } while (false)

@@ -33,7 +33,7 @@ enum TokenType {
   TOKEN_AND = '&',
   TOKEN_OR = '|',
   TOKEN_BNEG = '~',
-  
+
   TOKEN_TYPE_START = 256,
   TOKEN_INTEGER,
   TOKEN_FLOAT,
@@ -42,7 +42,7 @@ enum TokenType {
   TOKEN_STRING,
 
   TOKEN_IDENTIFIER = 512,
-  
+
   TOKEN_UTIL_START = 1024,
   TOKEN_UT_ALIGNAS,
   TOKEN_UT_ALIGNOF,
@@ -118,10 +118,9 @@ struct IntegerType {
 struct Token {
   enum TokenType ty;
   struct Location loc;
-  const uchar* start;
+  const uchar *start;
   usize token_len;
 };
-
 
 struct TokenStream {
   Vec(struct Token) tokens;
@@ -129,23 +128,22 @@ struct TokenStream {
 };
 
 struct Lexer {
-  struct TokenStream* stream;
+  struct TokenStream *stream;
   usize index;
   usize line;
   usize col;
-  const char* fname;
-  const char* contents;
+  const char *fname;
+  const char *contents;
   usize content_len;
 };
 
+struct TokenStream *token_stream_new();
+void token_stream_drop(struct TokenStream *self);
 
-struct TokenStream* token_stream_new();
-void token_stream_drop(struct TokenStream* self);
-
-void lexer_new(struct Lexer* self, char* fname);
-void lexer_lex(struct Lexer* self);
-void lexer_drop(struct Lexer* self);
-void lexer_dump(struct Lexer* self);
-extern  enum TokenType token_types[];
+void lexer_new(struct Lexer *self, char *fname);
+void lexer_lex(struct Lexer *self);
+void lexer_drop(struct Lexer *self);
+void lexer_dump(struct Lexer *self);
+extern enum TokenType token_types[];
 bool is_valid_ident_char(const char c);
-bool is_valid_ident(const char* ident);
+bool is_valid_ident(const char *ident);
