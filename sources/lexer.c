@@ -193,6 +193,21 @@ enum TokenType token_types[] = {
     self->col++;
   }
 
+bool is_valid_ident(const char* ident) {
+  char c;
+  while ( (c = *ident++) ) {
+    if (!(is_valid_ident_char(c))) return false;
+  }
+  return true;
+}
+
+bool is_valid_ident_char(const char c) {
+    bool cond_a = (c >= 'A' && c <= 'Z');
+    bool cond_b = (c >= 'a' && c <= 'z');
+    bool specials = (c == '$' || c == '_');
+    return (cond_a || cond_b || specials);
+}
+
 char next(struct Lexer* self) {
   advance(self);
   if (self->index < self->content_len) {
@@ -279,10 +294,12 @@ struct Token lex_ident(struct Lexer* self) {
   Vec(char) final_string = vec_new(char, 10);
   vec_push_one(final_string, this(self));
   char chr;
-  while ( (chr = next(self)) && isalpha(chr)) {
+  while ( (chr = next(self)) && is_valid_ident_char(chr)) {
       vec_push_one(final_string, chr);
   }
-    printf("hel\n");
+  // Next will be called *always*, therefore, it will be called
+  // One too many times in case of an invalid condition
+  self->index--;
 
   vec_push_one(final_string, 0);
   printf("Found lexed ident: %s\n", final_string);
@@ -302,7 +319,6 @@ void lexer_lex(struct Lexer* self) {
   char chr;
   while ( (chr = next(self)) ) {
     enum TokenType type = token_types[(usize)chr];
-  printf("He %d\n", type);
     switch (type) {
     case TOKEN_IDENTIFIER: {
       tpush(lex_ident(self));
@@ -341,6 +357,6 @@ void lexer_drop(struct Lexer* self) {
 void lexer_dump(struct Lexer* self) {
   printf("Lexer: File %s\n", self->fname);
   FOR_EACH_VEC(self->stream->tokens, it, {
-      printf("[%s]: \n\t Len %lu;\n\t Line %d;\n\t Column %d;\n\t Payload: '%s';\n", token_str[it.ty], it.token_len, it.loc.line_number, it.loc.column_number, it.start);
+      printf("Token {\n\t[%s]: \n\t Len %lu;\n\t Line %d;\n\t Column %d;\n\t Payload: %.*s\n}\n", token_str[it.ty], it.token_len, it.loc.line_number, it.loc.column_number, (int) it.token_len, it.start);
   });
 }

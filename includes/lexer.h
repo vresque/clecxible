@@ -147,3 +147,5 @@ void lexer_lex(struct Lexer* self);
 void lexer_drop(struct Lexer* self);
 void lexer_dump(struct Lexer* self);
 extern  enum TokenType token_types[];
+bool is_valid_ident_char(const char c);
+bool is_valid_ident(const char* ident);
